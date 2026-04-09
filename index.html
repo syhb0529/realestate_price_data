@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>아파트 실거래 조회</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 24px; line-height: 1.5; }
+    .wrap { max-width: 760px; margin: 0 auto; }
+    h1 { font-size: 28px; margin-bottom: 8px; }
+    .desc { color: #555; margin-bottom: 20px; }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .full { grid-column: 1 / -1; }
+    label { display: block; font-weight: bold; margin-bottom: 6px; }
+    select, input, button { width: 100%; padding: 10px; font-size: 14px; box-sizing: border-box; }
+    button { cursor: pointer; border: 0; background: #1f6feb; color: white; border-radius: 6px; }
+    button.secondary { background: #444; }
+    .box { border: 1px solid #ddd; border-radius: 10px; padding: 16px; margin-top: 18px; }
+    .note { font-size: 13px; color: #666; }
+    .urlbox { word-break: break-all; background: #f6f8fa; padding: 12px; border-radius: 8px; margin-top: 10px; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>아파트 실거래 조회</h1>
+    <p class="desc">A안: 조회 버튼을 누르면 국토부 API 결과를 새 탭으로 엽니다. 표 형태 파싱이 아니라 새 창 열기 방식이라 CORS 문제를 피하기 쉽습니다.</p>
+
+    <div class="grid box">
+      <div class="full">
+        <label for="serviceKey">공공데이터 서비스키</label>
+        <input id="serviceKey" type="text" placeholder="서비스키 입력" />
+      </div>
+
+      <div>
+        <label for="sido">시/도</label>
+        <select id="sido"></select>
+      </div>
+
+      <div>
+        <label for="sigungu">시군구</label>
+        <select id="sigungu"></select>
+      </div>
+
+      <div>
+        <label for="dealYmd">계약년월</label>
+        <input id="dealYmd" type="month" />
+      </div>
+
+      <div>
+        <label for="dealDay">계약일</label>
+        <select id="dealDay">
+          <option value="">전체</option>
+        </select>
+      </div>
+
+      <div class="full">
+        <button id="openBtn">실거래 조회</button>
+      </div>
+      <div class="full">
+        <button id="copyBtn" class="secondary">조회 URL 복사</button>
+      </div>
+    </div>
+
+    <div class="box">
+      <div><strong>생성된 조회 URL</strong></div>
+      <div id="urlPreview" class="urlbox">아직 생성되지 않았습니다.</div>
+      <p class="note">이 방식은 월 단위 API 조회 결과를 새 탭으로 여는 방식입니다. 일별 조회는 API 결과(XML)에서 해당 날짜만 브라우저 찾기(Ctrl+F)로 보거나, 이후 2단계에서 별도 파싱 버전으로 확장하면 됩니다.</p>
+    </div>
+  </div>
+
+  <script>
+    const regions = {
+      "서울특별시": {
+        "강남구": "11680", "강동구": "11740", "강북구": "11305", "강서구": "11500", "관악구": "11620",
+        "광진구": "11215", "구로구": "11530", "금천구": "11545", "노원구": "11350", "도봉구": "11320",
+        "동대문구": "11230", "동작구": "11590", "마포구": "11440", "서대문구": "11410", "서초구": "11650",
+        "성동구": "11200", "성북구": "11290", "송파구": "11710", "양천구": "11470", "영등포구": "11560",
+        "용산구": "11170", "은평구": "11380", "종로구": "11110", "중구": "11140", "중랑구": "11260"
+      },
+      "경기도": {
+        "수원시 장안구": "41111", "수원시 권선구": "41113", "수원시 팔달구": "41115", "수원시 영통구": "41117",
+        "성남시 수정구": "41131", "성남시 중원구": "41133", "성남시 분당구": "41135", "고양시 덕양구": "41281",
+        "고양시 일산동구": "41285", "고양시 일산서구": "41287", "용인시 처인구": "41461", "용인시 기흥구": "41463",
+        "용인시 수지구": "41465", "부천시": "41190", "안양시 만안구": "41171", "안양시 동안구": "41173",
+        "화성시": "41590", "평택시": "41220", "하남시": "41450", "광명시": "41210"
+      },
+      "인천광역시": {
+        "계양구": "28245", "미추홀구": "28177", "남동구": "28200", "동구": "28140", "부평구": "28237",
+        "서구": "28260", "연수구": "28185", "중구": "28110"
+      },
+      "부산광역시": {
+        "강서구": "26440", "금정구": "26410", "남구": "26290", "동구": "26170", "동래구": "26260",
+        "부산진구": "26230", "북구": "26320", "사상구": "26530", "사하구": "26380", "서구": "26140",
+        "수영구": "26500", "연제구": "26470", "영도구": "26200", "중구": "26110", "해운대구": "26350"
+      } 
+    };
+
+    const sidoEl = document.getElementById('sido');
+    const sigunguEl = document.getElementById('sigungu');
+    const dealYmdEl = document.getElementById('dealYmd');
+    const dealDayEl = document.getElementById('dealDay');
+    const serviceKeyEl = document.getElementById('serviceKey');
+    const previewEl = document.getElementById('urlPreview');
+
+    function initRegions() {
+      Object.keys(regions).forEach(sido => {
+        const opt = document.createElement('option');
+        opt.value = sido;
+        opt.textContent = sido;
+        sidoEl.appendChild(opt);
+      });
+      updateSigungu();
+    }
+
+    function updateSigungu() {
+      const current = regions[sidoEl.value] || {};
+      sigunguEl.innerHTML = '';
+      Object.entries(current).forEach(([name, code]) => {
+        const opt = document.createElement('option');
+        opt.value = code;
+        opt.textContent = name;
+        sigunguEl.appendChild(opt);
+      });
+    }
+
+    function initDays() {
+      for (let i = 1; i <= 31; i++) {
+        const opt = document.createElement('option');
+        opt.value = String(i).padStart(2, '0');
+        opt.textContent = `${i}일`;
+        dealDayEl.appendChild(opt);
+      }
+    }
+
+    function getDealYmd() {
+      const value = dealYmdEl.value;
+      if (!value) return '';
+      return value.replace('-', '');
+    }
+
+    function buildUrl() {
+      const serviceKey = serviceKeyEl.value.trim();
+      const lawdCd = sigunguEl.value;
+      const dealYmd = getDealYmd();
+      if (!serviceKey || !lawdCd || !dealYmd) {
+        throw new Error('서비스키, 지역, 계약년월을 입력해야 합니다.');
+      }
+      const base = 'https://apis.data.go.kr/1613000/RTMSDataSvcAptTrade/getRTMSDataSvcAptTrade';
+      const params = new URLSearchParams({
+        serviceKey,
+        LAWD_CD: lawdCd,
+        DEAL_YMD: dealYmd,
+        pageNo: '1',
+        numOfRows: '1000'
+      });
+      return `${base}?${params.toString()}`;
+    }
+
+    function refreshPreview() {
+      try {
+        previewEl.textContent = buildUrl();
+      } catch (e) {
+        previewEl.textContent = e.message;
+      }
+    }
+
+    document.getElementById('openBtn').addEventListener('click', () => {
+      try {
+        const url = buildUrl();
+        previewEl.textContent = url;
+        const selectedDay = dealDayEl.value;
+        if (selectedDay) {
+          alert('이 API는 월 단위 조회입니다. 새 탭에서 열린 XML에서 dealDay 값으로 해당 일자를 확인하세요. 예: Ctrl+F 후 <dealDay>' + Number(selectedDay) + '</dealDay> 검색');
+        }
+        window.open(url, '_blank', 'noopener');
+      } catch (e) {
+        alert(e.message);
+      }
+    });
+
+    document.getElementById('copyBtn').addEventListener('click', async () => {
+      try {
+        const url = buildUrl();
+        await navigator.clipboard.writeText(url);
+        previewEl.textContent = url;
+        alert('조회 URL을 복사했습니다.');
+      } catch (e) {
+        alert('복사 실패: ' + e.message);
+      }
+    });
+
+    sidoEl.addEventListener('change', () => { updateSigungu(); refreshPreview(); });
+    sigunguEl.addEventListener('change', refreshPreview);
+    dealYmdEl.addEventListener('change', refreshPreview);
+    dealDayEl.addEventListener('change', refreshPreview);
+    serviceKeyEl.addEventListener('input', refreshPreview);
+
+    initRegions();
+    initDays();
+    const now = new Date();
+    dealYmdEl.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    refreshPreview();
+  </script>
+</body>
+</html>
