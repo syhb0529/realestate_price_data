@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>아파트 실거래 조회</title>
+<style>
+body{font-family:Arial,sans-serif;max-width:1180px;margin:24px auto;padding:0 16px;color:#222}
+h1{font-size:28px;margin-bottom:8px}
+.small{color:#666;font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(6,minmax(120px,1fr));gap:12px}
+.card{border:1px solid #ddd;border-radius:10px;padding:14px;margin:14px 0}
+label{display:block;font-size:13px;margin-bottom:6px;color:#444}
+select,input,button{width:100%;padding:10px;border:1px solid #bbb;border-radius:8px;font-size:14px;box-sizing:border-box}
+button{cursor:pointer;background:#1f6feb;color:white;border:none}
+button.secondary{background:#f5f5f5;color:#222;border:1px solid #ccc}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.row > *{flex:1}
+.notice{background:#fff8e1;border:1px solid #f0d58a;padding:10px;border-radius:8px;font-size:14px}
+.error{background:#fff1f1;border:1px solid #ef9a9a;padding:10px;border-radius:8px;color:#8a1f11}
+.ok{background:#eef9ee;border:1px solid #9ad29a;padding:10px;border-radius:8px;color:#155724}
+table{width:100%;border-collapse:collapse;margin-top:12px;font-size:14px}
+th,td{border-bottom:1px solid #e5e5e5;padding:8px;text-align:left}
+th{background:#fafafa;position:sticky;top:0}
+.right{text-align:right}
+.hidden{display:none}
+@media(max-width:960px){.grid{grid-template-columns:repeat(2,minmax(120px,1fr));}}
+</style>
+</head>
+<body>
+<h1>아파트 실거래 조회</h1>
+<div class="small">B안: 웹페이지에서 표 형태로 직접 조회하는 버전입니다. 현재는 직접 호출이 가장 잘 동작하도록 기본값을 맞췄습니다.</div>
+
+<div class="card notice">
+  <div><strong>중요</strong>: 현재 환경에서는 <strong>직접 호출</strong>이 가장 잘 동작할 수 있습니다. 공개 프록시(allorigins, cors.isomorphic-git.org)는 차단·지연으로 오히려 실패할 수 있으니 직접 호출이 안 될 때만 바꿔보세요.</div>
+</div>
+
+<div class="card">
+  <div class="grid">
+    <div>
+      <label>서비스키</label>
+      <input id="serviceKey" type="password" placeholder="공공데이터포털 일반 인증키(Decoding) 권장" />
+    </div>
+    <div>
+      <label>프록시 방식</label>
+      <select id="proxyMode">
+        <option value="none">직접 호출(현재 추천)</option>
+        <option value="allorigins">allorigins</option>
+        <option value="corsfix">cors.isomorphic-git.org</option>
+      </select>
+    </div>
+    <div>
+      <label>시/도</label>
+      <select id="sido"></select>
+    </div>
+    <div>
+      <label>시군구</label>
+      <select id="sigungu"></select>
+    </div>
+    <div>
+      <label>계약년월</label>
+      <input id="dealYmd" type="month" />
+    </div>
+    <div>
+      <label>계약일(선택)</label>
+      <select id="dealDay">
+        <option value="">전체</option>
+      </select>
+    </div>
+  </div>
+  <div class="row" style="margin-top:12px">
+    <div><label>아파트명 검색</label><input id="aptFilter" placeholder="예: 래미안" /></div>
+    <div><label>정렬</label>
+      <select id="sortKey">
+        <option value="dealAmountDesc">거래금액 높은순</option>
+        <option value="dealAmountAsc">거래금액 낮은순</option>
+        <option value="areaDesc">전용면적 큰순</option>
+        <option value="dayAsc">계약일 빠른순</option>
+      </select>
+    </div>
+    <div><label>&nbsp;</label><button id="fetchBtn">실거래 조회</button></div>
+    <div><label>&nbsp;</label><button class="secondary" id="csvBtn">CSV 다운로드</button></div>
+  </div>
+</div>
+
+<div id="status" class="hidden"></div>
+
+<div class="card">
+  <div class="row">
+    <div><strong>조회 결과</strong></div>
+    <div class="small" id="summary"></div>
+  </div>
+  <div style="max-height:540px;overflow:auto">
+    <table id="resultTable">
+      <thead>
+        <tr>
+          <th>계약일</th><th>단지명</th><th>법정동</th><th>전용면적</th><th class="right">거래금액(만원)</th><th>층</th><th>건축년도</th><th>거래유형</th><th>중개사소재지</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="card">
+  <strong>일별 건수</strong>
+  <div style="max-height:260px;overflow:auto">
+    <table id="dailyTable">
+      <thead><tr><th>일</th><th class="right">건수</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+const regions = {
+  "서울특별시": {"강남구":"11680","강동구":"11740","강북구":"11305","강서구":"11500","관악구":"11620","광진구":"11215","구로구":"11530","금천구":"11545","노원구":"11350","도봉구":"11320","동대문구":"11230","동작구":"11590","마포구":"11440","서대문구":"11410","서초구":"11650","성동구":"11200","성북구":"11290","송파구":"11710","양천구":"11470","영등포구":"11560","용산구":"11170","은평구":"11380","종로구":"11110","중구":"11140","중랑구":"11260"},
+  "부산광역시": {"강서구":"26440","금정구":"26410","기장군":"26710","남구":"26290","동구":"26170","동래구":"26260","부산진구":"26230","북구":"26320","사상구":"26530","사하구":"26380","서구":"26140","수영구":"26500","연제구":"26470","영도구":"26200","중구":"26110","해운대구":"26350"},
+  "대구광역시": {"군위군":"27720","남구":"27200","달서구":"27290","달성군":"27710","동구":"27140","북구":"27230","서구":"27170","수성구":"27260","중구":"27110"},
+  "인천광역시": {"강화군":"28710","계양구":"28245","미추홀구":"28177","남동구":"28200","동구":"28140","부평구":"28237","서구":"28260","연수구":"28185","옹진군":"28720","중구":"28110"},
+  "광주광역시": {"광산구":"29200","남구":"29155","동구":"29110","북구":"29170","서구":"29140"},
+  "대전광역시": {"대덕구":"30230","동구":"30110","서구":"30170","유성구":"30200","중구":"30140"},
+  "울산광역시": {"남구":"31140","동구":"31170","북구":"31200","울주군":"31710","중구":"31110"},
+  "세종특별자치시": {"세종시":"36110"},
+  "경기도": {"가평군":"41820","고양시 덕양구":"41281","고양시 일산동구":"41285","고양시 일산서구":"41287","과천시":"41290","광명시":"41210","광주시":"41610","구리시":"41310","군포시":"41410","김포시":"41570","남양주시":"41360","동두천시":"41250","부천시":"41190","성남시 분당구":"41135","성남시 수정구":"41131","성남시 중원구":"41133","수원시 권선구":"41113","수원시 영통구":"41117","수원시 장안구":"41111","수원시 팔달구":"41115","시흥시":"41390","안산시 단원구":"41273","안산시 상록구":"41271","안성시":"41550","안양시 동안구":"41173","안양시 만안구":"41171","양주시":"41630","양평군":"41830","여주시":"41670","연천군":"41800","오산시":"41370","용인시 기흥구":"41463","용인시 수지구":"41465","용인시 처인구":"41461","의왕시":"41430","의정부시":"41150","이천시":"41500","파주시":"41480","평택시":"41220","포천시":"41650","하남시":"41450","화성시":"41590"},
+  "강원특별자치도": {"강릉시":"51150","고성군":"51820","동해시":"51170","삼척시":"51230","속초시":"51210","양구군":"51800","양양군":"51830","영월군":"51750","원주시":"51130","인제군":"51810","정선군":"51770","철원군":"51780","춘천시":"51110","태백시":"51190","평창군":"51760","홍천군":"51720","화천군":"51790","횡성군":"51730"},
+  "충청북도": {"괴산군":"43760","단양군":"43800","보은군":"43720","영동군":"43740","옥천군":"43730","음성군":"43770","제천시":"43150","증평군":"43745","진천군":"43750","청주시 상당구":"43111","청주시 서원구":"43112","청주시 청원구":"43114","청주시 흥덕구":"43113","충주시":"43130"},
+  "충청남도": {"계룡시":"44250","공주시":"44150","금산군":"44710","논산시":"44230","당진시":"44270","보령시":"44180","부여군":"44760","서산시":"44210","서천군":"44770","아산시":"44200","예산군":"44810","천안시 동남구":"44131","천안시 서북구":"44133","청양군":"44790","태안군":"44825","홍성군":"44800"},
+  "전북특별자치도": {"고창군":"45790","군산시":"45130","김제시":"45210","남원시":"45190","무주군":"45730","부안군":"45800","순창군":"45770","완주군":"45710","익산시":"45140","임실군":"45750","장수군":"45740","전주시 덕진구":"45113","전주시 완산구":"45111","정읍시":"45180","진안군":"45720"},
+  "전라남도": {"강진군":"46810","고흥군":"46770","곡성군":"46720","광양시":"46230","구례군":"46730","나주시":"46170","담양군":"46710","목포시":"46110","무안군":"46840","보성군":"46780","순천시":"46150","신안군":"46910","여수시":"46130","영광군":"46870","영암군":"46830","완도군":"46890","장성군":"46880","장흥군":"46800","진도군":"46900","함평군":"46860","해남군":"46820","화순군":"46790"},
+  "경상북도": {"경산시":"47290","경주시":"47130","고령군":"47830","구미시":"47190","김천시":"47150","문경시":"47280","봉화군":"47920","상주시":"47250","성주군":"47840","안동시":"47170","영덕군":"47770","영양군":"47760","영주시":"47210","영천시":"47230","예천군":"47900","울릉군":"47940","울진군":"47930","의성군":"47730","청도군":"47820","청송군":"47750","칠곡군":"47850","포항시 남구":"47111","포항시 북구":"47113"},
+  "경상남도": {"거제시":"48310","거창군":"48880","고성군":"48820","김해시":"48250","남해군":"48840","밀양시":"48270","사천시":"48240","산청군":"48860","양산시":"48330","의령군":"48720","진주시":"48170","창녕군":"48740","창원시 마산합포구":"48125","창원시 마산회원구":"48127","창원시 성산구":"48123","창원시 의창구":"48121","창원시 진해구":"48129","통영시":"48220","하동군":"48850","함안군":"48730","함양군":"48870","합천군":"48890"},
+  "제주특별자치도": {"서귀포시":"50130","제주시":"50110"}
+};};
+
+const statusEl = document.getElementById('status');
+const tbody = document.querySelector('#resultTable tbody');
+const dailyBody = document.querySelector('#dailyTable tbody');
+const summary = document.getElementById('summary');
+let currentRows = [];
+
+function setStatus(msg, type='ok'){
+  statusEl.className = type;
+  statusEl.textContent = msg;
+  statusEl.classList.remove('hidden');
+}
+function clearStatus(){ statusEl.className='hidden'; statusEl.textContent=''; }
+
+function moneyToNumber(v){
+  return Number(String(v||'').replace(/[^\d.-]/g,'')) || 0;
+}
+function text(v){ return (v ?? '').toString().trim(); }
+
+function populateRegions(){
+  const sido = document.getElementById('sido');
+  const sigungu = document.getElementById('sigungu');
+  sido.innerHTML = Object.keys(regions).map((k,i)=>`<option value="${k}" ${i===0?'selected':''}>${k}</option>`).join('');
+  function updateSigungu(){
+    const items = regions[sido.value];
+    sigungu.innerHTML = Object.keys(items).map(k=>`<option value="${items[k]}">${k}</option>`).join('');
+  }
+  sido.addEventListener('change', updateSigungu);
+  updateSigungu();
+}
+function populateDays(){
+  const sel = document.getElementById('dealDay');
+  let html = '<option value="">전체</option>';
+  for(let i=1;i<=31;i++) html += `<option value="${i}">${i}일</option>`;
+  sel.innerHTML = html;
+}
+function setDefaultMonth(){
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth()+1).padStart(2,'0');
+  document.getElementById('dealYmd').value = `${y}-${m}`;
+}
+function buildApiUrl(){
+  const serviceKey = document.getElementById('serviceKey').value.trim();
+  const lawd = document.getElementById('sigungu').value;
+  const dealMonthVal = document.getElementById('dealYmd').value;
+  if(!serviceKey) throw new Error('서비스키를 입력하세요.');
+  if(!dealMonthVal) throw new Error('계약년월을 선택하세요.');
+  const dealYmd = dealMonthVal.replace('-','');
+  const api = new URL('https://apis.data.go.kr/1613000/RTMSDataSvcAptTrade/getRTMSDataSvcAptTrade');
+  api.searchParams.set('serviceKey', serviceKey);
+  api.searchParams.set('LAWD_CD', lawd);
+  api.searchParams.set('DEAL_YMD', dealYmd);
+  api.searchParams.set('pageNo', '1');
+  api.searchParams.set('numOfRows', '1000');
+  return api.toString();
+}
+function buildFetchUrl(apiUrl){
+  const mode = document.getElementById('proxyMode').value;
+  if(mode === 'none') return apiUrl;
+  if(mode === 'allorigins'){
+    return 'https://api.allorigins.win/raw?url=' + encodeURIComponent(apiUrl);
+  }
+  if(mode === 'corsfix'){
+    return 'https://cors.isomorphic-git.org/' + apiUrl;
+  }
+  return apiUrl;
+}
+function parseXml(xmlText){
+  const parser = new DOMParser();
+  const xml = parser.parseFromString(xmlText, 'text/xml');
+  const resultCode = xml.querySelector('resultCode')?.textContent?.trim();
+  const resultMsg = xml.querySelector('resultMsg')?.textContent?.trim();
+  if(resultCode && resultCode !== '000'){
+    throw new Error(`API 오류 ${resultCode}: ${resultMsg || ''}`.trim());
+  }
+  const items = [...xml.querySelectorAll('item')];
+  return items.map(item => ({
+    aptNm: text(item.querySelector('aptNm')?.textContent),
+    umdNm: text(item.querySelector('umdNm')?.textContent),
+    excluUseAr: text(item.querySelector('excluUseAr')?.textContent),
+    dealAmount: text(item.querySelector('dealAmount')?.textContent),
+    floor: text(item.querySelector('floor')?.textContent),
+    buildYear: text(item.querySelector('buildYear')?.textContent),
+    dealYear: text(item.querySelector('dealYear')?.textContent),
+    dealMonth: text(item.querySelector('dealMonth')?.textContent),
+    dealDay: text(item.querySelector('dealDay')?.textContent),
+    dealingGbn: text(item.querySelector('dealingGbn')?.textContent),
+    estateAgentSggNm: text(item.querySelector('estateAgentSggNm')?.textContent),
+  }));
+}
+function applyFilters(rows){
+  const day = document.getElementById('dealDay').value;
+  const aptFilter = document.getElementById('aptFilter').value.trim().toLowerCase();
+  let filtered = rows.filter(r => !day || String(Number(r.dealDay||0)) === String(day));
+  if(aptFilter) filtered = filtered.filter(r => r.aptNm.toLowerCase().includes(aptFilter));
+  const sortKey = document.getElementById('sortKey').value;
+  filtered.sort((a,b)=>{
+    if(sortKey==='dealAmountDesc') return moneyToNumber(b.dealAmount) - moneyToNumber(a.dealAmount);
+    if(sortKey==='dealAmountAsc') return moneyToNumber(a.dealAmount) - moneyToNumber(b.dealAmount);
+    if(sortKey==='areaDesc') return (Number(b.excluUseAr)||0) - (Number(a.excluUseAr)||0);
+    if(sortKey==='dayAsc') return (Number(a.dealDay)||0) - (Number(b.dealDay)||0);
+    return 0;
+  });
+  return filtered;
+}
+function render(rows){
+  tbody.innerHTML = rows.map(r => `
+    <tr>
+      <td>${r.dealYear}-${String(r.dealMonth).padStart(2,'0')}-${String(r.dealDay).padStart(2,'0')}</td>
+      <td>${r.aptNm}</td>
+      <td>${r.umdNm}</td>
+      <td>${r.excluUseAr}</td>
+      <td class="right">${r.dealAmount}</td>
+      <td>${r.floor}</td>
+      <td>${r.buildYear}</td>
+      <td>${r.dealingGbn}</td>
+      <td>${r.estateAgentSggNm}</td>
+    </tr>
+  `).join('');
+  summary.textContent = `${rows.length}건`;
+  const counts = {};
+  currentRows.forEach(r => {
+    const d = Number(r.dealDay)||0;
+    if(!d) return;
+    counts[d] = (counts[d]||0)+1;
+  });
+  dailyBody.innerHTML = Object.keys(counts).sort((a,b)=>Number(a)-Number(b)).map(d=>`
+    <tr><td>${d}일</td><td class="right">${counts[d]}</td></tr>
+  `).join('');
+}
+async function fetchData(){
+  clearStatus();
+  tbody.innerHTML = '';
+  dailyBody.innerHTML = '';
+  summary.textContent = '';
+  try{
+    const apiUrl = buildApiUrl();
+    const fetchUrl = buildFetchUrl(apiUrl);
+    setStatus('조회 중...', 'ok');
+    const res = await fetch(fetchUrl);
+    const textBody = await res.text();
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    if(!textBody || !textBody.includes('<')) throw new Error('응답 형식이 올바르지 않습니다.');
+    currentRows = parseXml(textBody);
+    const filtered = applyFilters(currentRows);
+    render(filtered);
+    setStatus(`조회 성공: 원본 ${currentRows.length}건, 표시 ${filtered.length}건`, 'ok');
+  }catch(err){
+    setStatus(`오류: ${err.message}. 현재는 직접 호출이 가장 잘 맞을 수 있습니다. 직접 호출에서만 되면 그대로 사용하세요.`, 'error');
+  }
+}
+function downloadCsv(){
+  const rows = applyFilters(currentRows);
+  if(!rows.length){ setStatus('다운로드할 데이터가 없습니다.', 'error'); return; }
+  const header = ['계약일','단지명','법정동','전용면적','거래금액(만원)','층','건축년도','거래유형','중개사소재지'];
+  const lines = [header.join(',')];
+  rows.forEach(r=>{
+    const vals = [
+      `${r.dealYear}-${String(r.dealMonth).padStart(2,'0')}-${String(r.dealDay).padStart(2,'0')}`,
+      r.aptNm,r.umdNm,r.excluUseAr,r.dealAmount,r.floor,r.buildYear,r.dealingGbn,r.estateAgentSggNm
+    ].map(v => `"${String(v||'').replace(/"/g,'""')}"`);
+    lines.push(vals.join(','));
+  });
+  const blob = new Blob(["\ufeff"+lines.join('\n')], {type:'text/csv;charset=utf-8;'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'apt_trade.csv';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+document.getElementById('fetchBtn').addEventListener('click', fetchData);
+document.getElementById('csvBtn').addEventListener('click', downloadCsv);
+document.getElementById('dealDay').addEventListener('change', ()=> render(applyFilters(currentRows)));
+document.getElementById('aptFilter').addEventListener('input', ()=> render(applyFilters(currentRows)));
+document.getElementById('sortKey').addEventListener('change', ()=> render(applyFilters(currentRows)));
+
+populateRegions();
+populateDays();
+setDefaultMonth();
+</script>
+</body>
+</html>
