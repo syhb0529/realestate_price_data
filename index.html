@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
@@ -8,541 +8,613 @@
     :root {
       --bg: #f6f8fb;
       --card: #ffffff;
-      --line: #d9e0ea;
       --text: #1f2937;
-      --muted: #6b7280;
+      --sub: #6b7280;
+      --line: #e5e7eb;
       --blue: #2563eb;
-      --blue-soft: #eff6ff;
+      --blue2: #1d4ed8;
       --red: #dc2626;
       --green: #059669;
     }
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      padding: 24px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", Arial, sans-serif;
       background: var(--bg);
       color: var(--text);
-      font-family: "Segoe UI", "Malgun Gothic", sans-serif;
     }
-    .wrap { max-width: 1180px; margin: 0 auto; }
-    .title { margin: 0 0 8px; font-size: 28px; font-weight: 700; }
-    .sub { margin: 0 0 20px; color: var(--muted); }
-    .card {
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .hero, .card {
       background: var(--card);
       border: 1px solid var(--line);
       border-radius: 14px;
-      padding: 18px;
-      box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.04);
+    }
+    .hero {
+      padding: 20px;
       margin-bottom: 16px;
     }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(6, minmax(120px, 1fr));
-      gap: 12px;
+    h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
     }
-    .field { display: flex; flex-direction: column; gap: 6px; }
-    .field label { font-size: 13px; color: var(--muted); }
-    .field input, .field select {
-      height: 42px;
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      padding: 0 12px;
+    .sub {
+      color: var(--sub);
       font-size: 14px;
-      background: white;
+      line-height: 1.6;
     }
-    .actions {
-      display: flex; gap: 10px; align-items: end; flex-wrap: wrap; margin-top: 14px;
+    .toolbar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+    button, select, input {
+      font: inherit;
     }
     button {
-      height: 42px;
-      border: none;
-      border-radius: 10px;
-      padding: 0 16px;
-      font-size: 14px;
-      cursor: pointer;
       background: var(--blue);
       color: white;
-    }
-    button.secondary { background: #475569; }
-    button:disabled { opacity: .6; cursor: default; }
-    .msg { margin-top: 10px; font-size: 14px; color: var(--muted); }
-    .warn { color: var(--red); }
-    .ok { color: var(--green); }
-    .summary {
-      display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 12px;
-    }
-    .chip {
-      padding: 8px 12px;
-      border-radius: 999px;
-      background: var(--blue-soft);
-      color: #1d4ed8;
-      font-size: 13px;
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 14px;
+      cursor: pointer;
       font-weight: 600;
     }
-    details.group {
+    button:hover { background: var(--blue2); }
+    .btn-secondary {
+      background: #eef2ff;
+      color: var(--blue2);
+      border: 1px solid #c7d2fe;
+    }
+    .search-box {
+      display: grid;
+      grid-template-columns: 1fr 160px 140px;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .search-box input, .search-box select,
+    .filters select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px 12px;
+      background: white;
+    }
+    .status {
+      margin: 10px 0 0;
+      min-height: 22px;
+      font-size: 14px;
+      color: var(--sub);
+    }
+    .status.error { color: var(--red); }
+    .status.ok { color: var(--green); }
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin: 16px 0;
+    }
+    .metric {
+      padding: 14px;
+      background: var(--card);
       border: 1px solid var(--line);
       border-radius: 12px;
-      margin-bottom: 10px;
-      background: #fff;
+    }
+    .metric .label { color: var(--sub); font-size: 12px; }
+    .metric .value { font-size: 22px; font-weight: 700; margin-top: 4px; }
+    .group-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .group {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
       overflow: hidden;
     }
-    details.group[open] { border-color: #bfd3ff; }
-    details.group > summary {
-      list-style: none;
-      cursor: pointer;
-      padding: 14px 16px;
-      display: flex;
+    .group-head {
+      display: grid;
+      grid-template-columns: 36px 1.4fr 1fr 1fr 110px;
+      gap: 10px;
       align-items: center;
-      justify-content: space-between;
-      gap: 14px;
+      padding: 14px 16px;
+      cursor: pointer;
     }
-    details.group > summary::-webkit-details-marker { display: none; }
-    .s-left { display: flex; align-items: center; gap: 10px; min-width: 0; }
-    .arrow {
-      width: 24px; height: 24px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center;
-      background: #eef2ff; color: #4338ca; font-size: 12px; flex: 0 0 auto;
+    .apt-name { font-size: 18px; font-weight: 700; }
+    .small { color: var(--sub); font-size: 12px; }
+    .chev {
+      width: 28px; height: 28px; border-radius: 999px;
+      display: grid; place-items: center; background: #eff6ff; color: var(--blue2);
+      transition: transform .2s ease;
+      font-weight: 700;
     }
-    details[open] .arrow { transform: rotate(90deg); }
-    .apt-name { font-size: 16px; font-weight: 700; }
-    .apt-meta { color: var(--muted); font-size: 13px; }
-    .s-right { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
-    .badge {
-      padding: 6px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; background: #f1f5f9; color: #334155;
+    .group.open .chev { transform: rotate(90deg); }
+    .details { display: none; border-top: 1px solid var(--line); background: #fcfdff; }
+    .group.open .details { display: block; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
     }
-    .badge.red { background: #fef2f2; color: #b91c1c; }
-    table { width: 100%; border-collapse: collapse; }
     th, td {
-      padding: 10px 12px; border-top: 1px solid var(--line); text-align: left; font-size: 14px; vertical-align: middle;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
     }
-    th { background: #f8fafc; color: #475569; font-weight: 700; }
-    .price { font-weight: 700; }
-    .cancel { color: var(--red); font-weight: 700; margin-left: 4px; }
-    .small { font-size: 12px; color: var(--muted); }
-    .footer-note { font-size: 13px; color: var(--muted); line-height: 1.5; }
+    th { background: #f9fafb; color: #374151; }
+    .cancel { color: var(--red); font-weight: 700; }
+    .pill {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: #f3f4f6;
+      font-size: 12px;
+      color: #374151;
+    }
+    .bottom-panel {
+      position: sticky;
+      bottom: 0;
+      background: rgba(246,248,251,0.95);
+      backdrop-filter: blur(6px);
+      padding: 14px 0 4px;
+    }
+    .filters {
+      padding: 14px;
+    }
+    .filters-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 150px 120px 160px;
+      gap: 10px;
+      align-items: end;
+    }
+    .field label {
+      display: block;
+      font-size: 12px;
+      color: var(--sub);
+      margin-bottom: 6px;
+    }
+    .hidden-note {
+      font-size: 12px;
+      color: var(--sub);
+      margin-top: 10px;
+    }
     @media (max-width: 900px) {
-      .grid { grid-template-columns: repeat(2, minmax(120px, 1fr)); }
-      details.group > summary { flex-direction: column; align-items: flex-start; }
-      .s-right { justify-content: flex-start; }
+      .summary { grid-template-columns: repeat(2, 1fr); }
+      .search-box { grid-template-columns: 1fr; }
+      .filters-grid { grid-template-columns: 1fr 1fr; }
+      .group-head { grid-template-columns: 36px 1fr; }
+      .group-head > div:nth-child(n+3) { display: none; }
     }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <h1 class="title">아파트 실거래 조회</h1>
-    <p class="sub">월 단위 조회 후 계약일 기준으로 일별 필터를 적용합니다. 조회할 때마다 API를 다시 호출합니다.</p>
+    <div class="hero">
+      <h1>아파트 실거래 조회</h1>
+      <div class="sub">
+        같은 단지는 하나로 묶고, 화살표를 눌러 세부 거래를 펼쳐봅니다.<br>
+        해제 거래는 가격 옆에 <b>(해제)</b>로 표기합니다. 조회할 때마다 API를 다시 호출합니다.
+      </div>
 
-    <div class="card">
-      <div class="grid">
-        <div class="field" style="grid-column: span 2;">
-          <label for="serviceKey">공공데이터 서비스키</label>
-          <input id="serviceKey" type="text" placeholder="서비스키를 입력하세요" />
-        </div>
-        <div class="field">
-          <label for="sido">시/도</label>
-          <select id="sido"></select>
-        </div>
-        <div class="field">
-          <label for="sigungu">시군구</label>
-          <select id="sigungu"></select>
-        </div>
-        <div class="field">
-          <label for="dealYmd">계약년월</label>
-          <input id="dealYmd" type="month" />
-        </div>
-        <div class="field">
-          <label for="dealDay">계약일</label>
-          <select id="dealDay">
-            <option value="">전체</option>
-          </select>
-        </div>
+      <div class="search-box">
+        <input id="aptSearch" type="text" placeholder="단지명 검색" />
+        <select id="sortBy">
+          <option value="latest">최신 계약일순</option>
+          <option value="priceDesc">최고가순</option>
+          <option value="priceAsc">최저가순</option>
+          <option value="countDesc">거래건수순</option>
+        </select>
+        <button id="csvBtn" class="btn-secondary" type="button">CSV 다운로드</button>
       </div>
-      <div class="actions">
-        <button id="searchBtn">실거래 조회</button>
-        <button id="sampleBtn" class="secondary">샘플 데이터 보기</button>
-      </div>
-      <div id="message" class="msg"></div>
+
+      <div id="status" class="status">하단에서 지역과 년월/일을 고른 뒤 조회하세요.</div>
     </div>
 
-    <div id="resultCard" class="card" style="display:none;">
-      <div class="summary" id="summary"></div>
-      <div id="result"></div>
+    <div class="summary">
+      <div class="metric"><div class="label">조회 단지 수</div><div id="mAptCount" class="value">0</div></div>
+      <div class="metric"><div class="label">조회 거래 수</div><div id="mTradeCount" class="value">0</div></div>
+      <div class="metric"><div class="label">해제 거래 수</div><div id="mCancelCount" class="value">0</div></div>
+      <div class="metric"><div class="label">현재 지역</div><div id="mRegion" class="value" style="font-size:18px;">-</div></div>
     </div>
 
-    <div class="card footer-note">
-      <div>표시 규칙</div>
-      <div>- 해제 거래는 가격 옆에 <strong>(해제)</strong>로 표시</div>
-      <div>- 같은 단지는 하나로 묶고, 화살표 클릭 시 세부 거래 목록 표시</div>
-      <div>- 계약년월은 API 기준 월 조회, 계약일은 받은 결과 안에서 필터링</div>
+    <div id="groupList" class="group-list"></div>
+
+    <div class="bottom-panel">
+      <div class="card filters">
+        <div class="filters-grid">
+          <div class="field">
+            <label for="sido">시/도</label>
+            <select id="sido"></select>
+          </div>
+          <div class="field">
+            <label for="sigungu">시군구</label>
+            <select id="sigungu"></select>
+          </div>
+          <div class="field">
+            <label for="dealYmd">계약년월</label>
+            <select id="dealYmd"></select>
+          </div>
+          <div class="field">
+            <label for="dealDay">계약일</label>
+            <select id="dealDay"></select>
+          </div>
+          <div class="field">
+            <button id="loadBtn" type="button" style="width:100%;">실거래 조회</button>
+          </div>
+        </div>
+        <div class="hidden-note">
+          서비스키는 개인용으로 HTML 내부에 고정되어 있습니다. 공개 저장소/공개 배포용으로는 권장되지 않습니다.
+        </div>
+      </div>
     </div>
   </div>
 
   <script>
-    const API_URL = 'https://apis.data.go.kr/1613000/RTMSDataSvcAptTrade/getRTMSDataSvcAptTrade';
+    // 개인용 고정 서비스키
+    const SERVICE_KEY = '598bce83580adb2519dd776cc4c32fbf247610476b16d08872d055b709b8ccdc';
+    const API_BASE = 'https://apis.data.go.kr/1613000/RTMSDataSvcAptTrade/getRTMSDataSvcAptTrade';
 
     const regions = {
-      '서울특별시': [
-        { name: '강남구', code: '11680' }, { name: '강동구', code: '11740' }, { name: '강북구', code: '11305' },
-        { name: '강서구', code: '11500' }, { name: '관악구', code: '11620' }, { name: '광진구', code: '11215' },
-        { name: '구로구', code: '11530' }, { name: '금천구', code: '11545' }, { name: '노원구', code: '11350' },
-        { name: '도봉구', code: '11320' }, { name: '동대문구', code: '11230' }, { name: '동작구', code: '11590' },
-        { name: '마포구', code: '11440' }, { name: '서대문구', code: '11410' }, { name: '서초구', code: '11650' },
-        { name: '성동구', code: '11200' }, { name: '성북구', code: '11290' }, { name: '송파구', code: '11710' },
-        { name: '양천구', code: '11470' }, { name: '영등포구', code: '11560' }, { name: '용산구', code: '11170' },
-        { name: '은평구', code: '11380' }, { name: '종로구', code: '11110' }, { name: '중구', code: '11140' },
-        { name: '중랑구', code: '11260' }
-      ],
-      '경기도': [
-        { name: '가평군', code: '41820' }, { name: '고양덕양구', code: '41281' }, { name: '고양일산동구', code: '41285' },
-        { name: '고양일산서구', code: '41287' }, { name: '과천시', code: '41290' }, { name: '광명시', code: '41210' },
-        { name: '광주시', code: '41610' }, { name: '구리시', code: '41310' }, { name: '군포시', code: '41410' },
-        { name: '김포시', code: '41570' }, { name: '남양주시', code: '41360' }, { name: '동두천시', code: '41250' },
-        { name: '부천시', code: '41190' }, { name: '성남분당구', code: '41135' }, { name: '성남수정구', code: '41131' },
-        { name: '성남중원구', code: '41133' }, { name: '수원권선구', code: '41113' }, { name: '수원영통구', code: '41117' },
-        { name: '수원장안구', code: '41111' }, { name: '수원팔달구', code: '41115' }, { name: '시흥시', code: '41390' },
-        { name: '안산단원구', code: '41273' }, { name: '안산상록구', code: '41271' }, { name: '안성시', code: '41550' },
-        { name: '안양동안구', code: '41173' }, { name: '안양만안구', code: '41171' }, { name: '양주시', code: '41630' },
-        { name: '양평군', code: '41830' }, { name: '여주시', code: '41670' }, { name: '연천군', code: '41800' },
-        { name: '오산시', code: '41370' }, { name: '용인기흥구', code: '41463' }, { name: '용인수지구', code: '41465' },
-        { name: '용인처인구', code: '41461' }, { name: '의왕시', code: '41430' }, { name: '의정부시', code: '41150' },
-        { name: '이천시', code: '41500' }, { name: '파주시', code: '41480' }, { name: '평택시', code: '41220' },
-        { name: '포천시', code: '41650' }, { name: '하남시', code: '41450' }, { name: '화성시', code: '41590' }
-      ],
-      '인천광역시': [
-        { name: '계양구', code: '28245' }, { name: '남동구', code: '28200' }, { name: '동구', code: '28140' },
-        { name: '미추홀구', code: '28177' }, { name: '부평구', code: '28237' }, { name: '서구', code: '28260' },
-        { name: '연수구', code: '28185' }, { name: '중구', code: '28110' }
-      ],
-      '부산광역시': [
-        { name: '강서구', code: '26440' }, { name: '금정구', code: '26410' }, { name: '기장군', code: '26710' },
-        { name: '남구', code: '26290' }, { name: '동구', code: '26170' }, { name: '동래구', code: '26260' },
-        { name: '부산진구', code: '26230' }, { name: '북구', code: '26320' }, { name: '사상구', code: '26530' },
-        { name: '사하구', code: '26380' }, { name: '서구', code: '26140' }, { name: '수영구', code: '26500' },
-        { name: '연제구', code: '26470' }, { name: '영도구', code: '26200' }, { name: '중구', code: '26110' },
-        { name: '해운대구', code: '26350' }
-      ],
-      '대구광역시': [
-        { name: '남구', code: '27200' }, { name: '달서구', code: '27290' }, { name: '달성군', code: '27710' },
-        { name: '동구', code: '27140' }, { name: '북구', code: '27230' }, { name: '서구', code: '27170' },
-        { name: '수성구', code: '27260' }, { name: '중구', code: '27110' }
-      ]
+      '서울특별시': {
+        '강남구': '11680', '강동구': '11740', '강북구': '11305', '강서구': '11500', '관악구': '11620',
+        '광진구': '11215', '구로구': '11530', '금천구': '11545', '노원구': '11350', '도봉구': '11320',
+        '동대문구': '11230', '동작구': '11590', '마포구': '11440', '서대문구': '11410', '서초구': '11650',
+        '성동구': '11200', '성북구': '11290', '송파구': '11710', '양천구': '11470', '영등포구': '11560',
+        '용산구': '11170', '은평구': '11380', '종로구': '11110', '중구': '11140', '중랑구': '11260'
+      },
+      '경기도': {
+        '광명시': '41210', '수원시 장안구': '41111', '수원시 권선구': '41113', '수원시 팔달구': '41115', '수원시 영통구': '41117',
+        '성남시 수정구': '41131', '성남시 중원구': '41133', '성남시 분당구': '41135',
+        '고양시 덕양구': '41281', '고양시 일산동구': '41285', '고양시 일산서구': '41287',
+        '용인시 처인구': '41461', '용인시 기흥구': '41463', '용인시 수지구': '41465',
+        '안산시 상록구': '41271', '안산시 단원구': '41273', '안양시 만안구': '41171', '안양시 동안구': '41173',
+        '부천시': '41190', '화성시': '41590', '남양주시': '41360', '평택시': '41220', '의정부시': '41150',
+        '시흥시': '41390', '파주시': '41480', '김포시': '41570', '하남시': '41450', '광주시': '41610',
+        '군포시': '41410', '오산시': '41370', '이천시': '41500', '안성시': '41550', '양주시': '41630',
+        '구리시': '41310', '의왕시': '41430', '포천시': '41650', '여주시': '41670', '동두천시': '41250',
+        '과천시': '41290', '양평군': '41830', '가평군': '41820', '연천군': '41800'
+      },
+      '인천광역시': {
+        '계양구': '28245', '미추홀구': '28177', '남동구': '28200', '동구': '28140', '부평구': '28237',
+        '서구': '28260', '연수구': '28185', '중구': '28110'
+      },
+      '부산광역시': {
+        '강서구': '26440', '금정구': '26410', '남구': '26290', '동구': '26170', '동래구': '26260', '부산진구': '26230',
+        '북구': '26320', '사상구': '26530', '사하구': '26380', '서구': '26140', '수영구': '26500',
+        '연제구': '26470', '영도구': '26200', '중구': '26110', '해운대구': '26350'
+      },
+      '대구광역시': {
+        '남구': '27200', '달서구': '27290', '동구': '27140', '북구': '27230', '서구': '27170', '수성구': '27260', '중구': '27110', '달성군': '27710'
+      },
+      '대전광역시': { '대덕구': '30230', '동구': '30110', '서구': '30170', '유성구': '30200', '중구': '30140' },
+      '광주광역시': { '광산구': '29200', '남구': '29155', '동구': '29110', '북구': '29170', '서구': '29140' },
+      '울산광역시': { '남구': '31140', '동구': '31170', '북구': '31200', '중구': '31110', '울주군': '31710' },
+      '세종특별자치시': { '세종시': '36110' },
+      '강원특별자치도': { '춘천시': '51110', '원주시': '51130', '강릉시': '51150', '속초시': '51810' },
+      '충청북도': { '청주시 상당구': '43111', '청주시 서원구': '43112', '청주시 흥덕구': '43113', '청주시 청원구': '43114', '충주시': '43130', '제천시': '43150' },
+      '충청남도': { '천안시 동남구': '44131', '천안시 서북구': '44133', '아산시': '44200', '공주시': '44150', '서산시': '44210' },
+      '전북특별자치도': { '전주시 완산구': '52111', '전주시 덕진구': '52113', '군산시': '52130', '익산시': '52140' },
+      '전라남도': { '목포시': '46110', '여수시': '46130', '순천시': '46150', '광양시': '46230' },
+      '경상북도': { '포항시 남구': '47111', '포항시 북구': '47113', '구미시': '47190', '경산시': '47290', '경주시': '47130' },
+      '경상남도': { '창원시 의창구': '48121', '창원시 성산구': '48123', '창원시 마산합포구': '48125', '창원시 마산회원구': '48127', '창원시 진해구': '48129', '김해시': '48250', '양산시': '48330', '진주시': '48170' },
+      '제주특별자치도': { '제주시': '50110', '서귀포시': '50130' }
     };
 
-    const sampleItems = [
-      { aptNm:'광명역써밋플레이스', aptDong:'101동', excluUseAr:'84.97', floor:'21', dealAmount:'93,000', dealYear:'2026', dealMonth:'4', dealDay:'1', buildYear:'2017', dealingGbn:'중개거래', cdealType:'', cdealDay:'', estateAgentSggNm:'경기 광명시' },
-      { aptNm:'광명역써밋플레이스', aptDong:'103동', excluUseAr:'84.97', floor:'14', dealAmount:'91,500', dealYear:'2026', dealMonth:'4', dealDay:'1', buildYear:'2017', dealingGbn:'중개거래', cdealType:'O', cdealDay:'20260409', estateAgentSggNm:'경기 광명시' },
-      { aptNm:'철산래미안자이', aptDong:'209동', excluUseAr:'59.99', floor:'9', dealAmount:'78,000', dealYear:'2026', dealMonth:'4', dealDay:'1', buildYear:'2009', dealingGbn:'직거래', cdealType:'', cdealDay:'', estateAgentSggNm:'경기 광명시' },
-      { aptNm:'철산래미안자이', aptDong:'', excluUseAr:'84.98', floor:'18', dealAmount:'102,000', dealYear:'2026', dealMonth:'4', dealDay:'7', buildYear:'2009', dealingGbn:'중개거래', cdealType:'', cdealDay:'', estateAgentSggNm:'경기 광명시' }
-    ];
+    const state = {
+      raw: [],
+      filtered: [],
+      grouped: []
+    };
 
-    const serviceKeyEl = document.getElementById('serviceKey');
-    const sidoEl = document.getElementById('sido');
-    const sigunguEl = document.getElementById('sigungu');
-    const dealYmdEl = document.getElementById('dealYmd');
-    const dealDayEl = document.getElementById('dealDay');
-    const msgEl = document.getElementById('message');
-    const resultEl = document.getElementById('result');
-    const resultCardEl = document.getElementById('resultCard');
-    const summaryEl = document.getElementById('summary');
-    const searchBtn = document.getElementById('searchBtn');
-    const sampleBtn = document.getElementById('sampleBtn');
+    const $ = (id) => document.getElementById(id);
 
-    let lastItems = [];
+    function setStatus(msg, cls='') {
+      const el = $('status');
+      el.textContent = msg;
+      el.className = 'status ' + cls;
+    }
 
-    function setDefaultMonth() {
+    function formatMoney(v) {
+      const n = Number(String(v).replace(/,/g, ''));
+      if (Number.isNaN(n)) return v || '-';
+      return n.toLocaleString('ko-KR') + '만원';
+    }
+
+    function formatDate(y, m, d) {
+      const mm = String(m).padStart(2, '0');
+      const dd = String(d).padStart(2, '0');
+      return `${y}-${mm}-${dd}`;
+    }
+
+    function initYmd() {
+      const ymd = $('dealYmd');
       const now = new Date();
-      const month = String(now.getMonth() + 1).padStart(2, '0');
-      dealYmdEl.value = `${now.getFullYear()}-${month}`;
+      const opts = [];
+      for (let i = 0; i < 36; i++) {
+        const dt = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const val = `${dt.getFullYear()}${String(dt.getMonth()+1).padStart(2,'0')}`;
+        const text = `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}`;
+        opts.push(`<option value="${val}">${text}</option>`);
+      }
+      ymd.innerHTML = opts.join('');
+      ymd.value = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}`;
+    }
+
+    function initDays() {
+      const day = $('dealDay');
+      let html = '<option value="">전체</option>';
+      for (let i = 1; i <= 31; i++) {
+        html += `<option value="${i}">${i}일</option>`;
+      }
+      day.innerHTML = html;
     }
 
     function populateSido() {
-      sidoEl.innerHTML = '';
-      Object.keys(regions).forEach((name, index) => {
-        const opt = document.createElement('option');
-        opt.value = name;
-        opt.textContent = name;
-        if (index === 1) opt.selected = true; // 경기도 기본
-        sidoEl.appendChild(opt);
-      });
+      const sido = $('sido');
+      sido.innerHTML = Object.keys(regions).map((name) => `<option value="${name}">${name}</option>`).join('');
+      if (regions['경기도']) sido.value = '경기도';
       populateSigungu();
     }
 
     function populateSigungu() {
-      const sido = sidoEl.value;
-      sigunguEl.innerHTML = '';
-      (regions[sido] || []).forEach((item, index) => {
-        const opt = document.createElement('option');
-        opt.value = item.code;
-        opt.textContent = item.name;
-        if (sido === '경기도' && item.name === '광명시') opt.selected = true;
-        else if (index === 0 && !Array.from(sigunguEl.options).some(o => o.selected)) opt.selected = true;
-        sigunguEl.appendChild(opt);
-      });
+      const sidoVal = $('sido').value;
+      const target = regions[sidoVal] || {};
+      const sigungu = $('sigungu');
+      sigungu.innerHTML = Object.keys(target).map((name) => `<option value="${target[name]}">${name}</option>`).join('');
+      if (sidoVal === '경기도' && target['광명시']) sigungu.value = target['광명시'];
+      updateRegionMetric();
     }
 
-    function populateDayOptions(items) {
-      const prev = dealDayEl.value;
-      const days = [...new Set(items.map(v => Number(v.dealDay)).filter(Boolean))].sort((a,b) => a-b);
-      dealDayEl.innerHTML = '<option value="">전체</option>';
-      days.forEach(day => {
-        const opt = document.createElement('option');
-        opt.value = String(day);
-        opt.textContent = `${day}일`;
-        if (String(day) === prev) opt.selected = true;
-        dealDayEl.appendChild(opt);
-      });
+    function selectedRegionName() {
+      const sido = $('sido').value;
+      const sigunguSel = $('sigungu');
+      const sigunguName = sigunguSel.options[sigunguSel.selectedIndex]?.text || '';
+      return `${sido} ${sigunguName}`.trim();
     }
 
-    function setMessage(text, type='') {
-      msgEl.className = `msg ${type}`;
-      msgEl.textContent = text;
+    function updateRegionMetric() {
+      $('mRegion').textContent = selectedRegionName() || '-';
     }
 
-    function xmlText(parent, tag) {
-      const node = parent.querySelector(tag);
-      return node ? (node.textContent || '').trim() : '';
-    }
-
-    function parseXml(xmlString) {
-      const parser = new DOMParser();
-      const xml = parser.parseFromString(xmlString, 'text/xml');
-      const resultCode = xmlText(xml, 'resultCode');
-      const resultMsg = xmlText(xml, 'resultMsg');
-      if (resultCode && resultCode !== '000') {
-        throw new Error(`${resultCode} ${resultMsg || 'API 오류'}`);
-      }
-      return [...xml.querySelectorAll('item')].map(item => ({
-        aptNm: xmlText(item, 'aptNm'),
-        aptDong: xmlText(item, 'aptDong'),
-        excluUseAr: xmlText(item, 'excluUseAr'),
-        floor: xmlText(item, 'floor'),
-        dealAmount: xmlText(item, 'dealAmount'),
-        dealYear: xmlText(item, 'dealYear'),
-        dealMonth: xmlText(item, 'dealMonth'),
-        dealDay: xmlText(item, 'dealDay'),
-        buildYear: xmlText(item, 'buildYear'),
-        dealingGbn: xmlText(item, 'dealingGbn'),
-        cdealType: xmlText(item, 'cdealType'),
-        cdealDay: xmlText(item, 'cdealDay'),
-        estateAgentSggNm: xmlText(item, 'estateAgentSggNm')
-      }));
-    }
-
-    function formatDate(item) {
-      return `${item.dealYear}.${String(item.dealMonth).padStart(2, '0')}.${String(item.dealDay).padStart(2, '0')}`;
-    }
-
-    function isCancelled(item) {
-      return !!(item.cdealType && item.cdealType.trim());
-    }
-
-    function formatAmount(v) {
-      const clean = String(v || '').replace(/,/g, '');
-      const num = Number(clean);
-      return Number.isFinite(num) ? num.toLocaleString('ko-KR') + '만원' : (v || '');
-    }
-
-    function groupItems(items) {
-      const grouped = new Map();
-      items.forEach(item => {
-        const key = item.aptNm || '이름없음';
-        if (!grouped.has(key)) grouped.set(key, []);
-        grouped.get(key).push(item);
-      });
-      return [...grouped.entries()].map(([aptNm, rows]) => {
-        rows.sort((a,b) => {
-          const ad = Number(a.dealDay || 0), bd = Number(b.dealDay || 0);
-          if (ad !== bd) return ad - bd;
-          return (a.aptDong || '').localeCompare(b.aptDong || '');
-        });
-        const cancelledCount = rows.filter(isCancelled).length;
-        const areaSet = [...new Set(rows.map(r => r.excluUseAr).filter(Boolean))];
-        return { aptNm, rows, count: rows.length, cancelledCount, areas: areaSet };
-      }).sort((a,b) => a.aptNm.localeCompare(b.aptNm, 'ko'));
-    }
-
-    function render(items) {
-      const dayFilter = dealDayEl.value;
-      const filtered = dayFilter ? items.filter(v => String(Number(v.dealDay)) === String(Number(dayFilter))) : items;
-      populateDayOptions(items);
-      resultCardEl.style.display = 'block';
-      summaryEl.innerHTML = '';
-      resultEl.innerHTML = '';
-
-      const total = filtered.length;
-      const cancelled = filtered.filter(isCancelled).length;
-      const groups = groupItems(filtered);
-      const lawdName = sigunguEl.options[sigunguEl.selectedIndex]?.text || '';
-      const monthText = dealYmdEl.value ? dealYmdEl.value.replace('-', '.') : '';
-
-      [
-        `지역: ${sidoEl.value} ${lawdName}`,
-        `계약년월: ${monthText}`,
-        `계약일: ${dayFilter ? dayFilter + '일' : '전체'}`,
-        `거래건수: ${total}건`,
-        `해제표시건수: ${cancelled}건`
-      ].forEach(text => {
-        const chip = document.createElement('div');
-        chip.className = 'chip';
-        chip.textContent = text;
-        summaryEl.appendChild(chip);
-      });
-
-      if (!filtered.length) {
-        resultEl.innerHTML = '<div class="msg">조건에 맞는 거래가 없습니다.</div>';
+    async function loadTrades() {
+      const lawdCd = $('sigungu').value;
+      const dealYmd = $('dealYmd').value;
+      const dayFilter = $('dealDay').value;
+      if (!lawdCd || !dealYmd) {
+        setStatus('지역과 계약년월을 선택하세요.', 'error');
         return;
       }
 
-      groups.forEach(group => {
-        const details = document.createElement('details');
-        details.className = 'group';
-        const summary = document.createElement('summary');
-        const areaText = group.areas.length ? `전용 ${group.areas.join(', ')}㎡` : '전용면적 없음';
-        summary.innerHTML = `
-          <div class="s-left">
-            <span class="arrow">▶</span>
-            <div>
-              <div class="apt-name">${escapeHtml(group.aptNm)}</div>
-              <div class="apt-meta">${escapeHtml(areaText)}</div>
-            </div>
-          </div>
-          <div class="s-right">
-            <span class="badge">${group.count}건</span>
-            ${group.cancelledCount ? `<span class="badge red">해제 ${group.cancelledCount}건</span>` : ''}
-          </div>
-        `;
-        details.appendChild(summary);
-
-        const table = document.createElement('table');
-        table.innerHTML = `
-          <thead>
-            <tr>
-              <th>계약일</th>
-              <th>동</th>
-              <th>전용면적</th>
-              <th>층</th>
-              <th>거래금액</th>
-              <th>거래유형</th>
-              <th>건축년도</th>
-              <th>중개사소재지</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${group.rows.map(row => `
-              <tr>
-                <td>${escapeHtml(formatDate(row))}${isCancelled(row) && row.cdealDay ? `<div class="small">해제일 ${escapeHtml(row.cdealDay)}</div>` : ''}</td>
-                <td>${escapeHtml(row.aptDong || '-')}</td>
-                <td>${escapeHtml(row.excluUseAr || '-')}</td>
-                <td>${escapeHtml(row.floor || '-')}</td>
-                <td class="price">${escapeHtml(formatAmount(row.dealAmount))}${isCancelled(row) ? '<span class="cancel">(해제)</span>' : ''}</td>
-                <td>${escapeHtml(row.dealingGbn || '-')}</td>
-                <td>${escapeHtml(row.buildYear || '-')}</td>
-                <td>${escapeHtml(row.estateAgentSggNm || '-')}</td>
-              </tr>
-            `).join('')}
-          </tbody>
-        `;
-        details.appendChild(table);
-        resultEl.appendChild(details);
+      setStatus('실거래 데이터를 조회 중입니다...', '');
+      const params = new URLSearchParams({
+        serviceKey: SERVICE_KEY,
+        LAWD_CD: lawdCd,
+        DEAL_YMD: dealYmd,
+        pageNo: '1',
+        numOfRows: '1000'
       });
-    }
+      const url = `${API_BASE}?${params.toString()}`;
 
-    function escapeHtml(value) {
-      return String(value ?? '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-    }
-
-    async function fetchAllPages(serviceKey, lawdCd, dealYmd) {
-      let pageNo = 1;
-      const numOfRows = 1000;
-      let totalCount = null;
-      let allItems = [];
-
-      while (true) {
-        const url = new URL(API_URL);
-        url.searchParams.set('serviceKey', serviceKey);
-        url.searchParams.set('LAWD_CD', lawdCd);
-        url.searchParams.set('DEAL_YMD', dealYmd);
-        url.searchParams.set('pageNo', pageNo);
-        url.searchParams.set('numOfRows', numOfRows);
-
-        const response = await fetch(url.toString());
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const xmlTextResp = await response.text();
-        const parser = new DOMParser();
-        const xml = parser.parseFromString(xmlTextResp, 'text/xml');
-        const resultCode = xmlText(xml, 'resultCode');
-        const resultMsg = xmlText(xml, 'resultMsg');
-        if (resultCode && resultCode !== '000') throw new Error(`${resultCode} ${resultMsg || 'API 오류'}`);
-
-        const items = [...xml.querySelectorAll('item')].map(item => ({
-          aptNm: xmlText(item, 'aptNm'),
-          aptDong: xmlText(item, 'aptDong'),
-          excluUseAr: xmlText(item, 'excluUseAr'),
-          floor: xmlText(item, 'floor'),
-          dealAmount: xmlText(item, 'dealAmount'),
-          dealYear: xmlText(item, 'dealYear'),
-          dealMonth: xmlText(item, 'dealMonth'),
-          dealDay: xmlText(item, 'dealDay'),
-          buildYear: xmlText(item, 'buildYear'),
-          dealingGbn: xmlText(item, 'dealingGbn'),
-          cdealType: xmlText(item, 'cdealType'),
-          cdealDay: xmlText(item, 'cdealDay'),
-          estateAgentSggNm: xmlText(item, 'estateAgentSggNm')
-        }));
-        allItems = allItems.concat(items);
-
-        if (totalCount === null) totalCount = Number(xmlText(xml, 'totalCount') || 0);
-        if (allItems.length >= totalCount || items.length === 0) break;
-        pageNo += 1;
-      }
-      return allItems;
-    }
-
-    async function handleSearch() {
-      const serviceKey = serviceKeyEl.value.trim();
-      const lawdCd = sigunguEl.value;
-      const ym = dealYmdEl.value;
-      if (!serviceKey) {
-        setMessage('서비스키를 입력하세요.', 'warn');
-        return;
-      }
-      if (!lawdCd || !ym) {
-        setMessage('지역과 계약년월을 선택하세요.', 'warn');
-        return;
-      }
-      const dealYmd = ym.replace('-', '');
-      searchBtn.disabled = true;
-      setMessage('조회 중입니다. API를 다시 호출하고 있습니다...');
       try {
-        const items = await fetchAllPages(serviceKey, lawdCd, dealYmd);
-        lastItems = items;
-        populateDayOptions(items);
-        render(items);
-        setMessage(`조회 완료: ${items.length}건`, 'ok');
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const xmlText = await res.text();
+        const doc = new DOMParser().parseFromString(xmlText, 'text/xml');
+        const resultCode = doc.querySelector('resultCode')?.textContent?.trim();
+        const resultMsg = doc.querySelector('resultMsg')?.textContent?.trim();
+        if (resultCode && resultCode !== '000') {
+          throw new Error(`${resultCode} ${resultMsg || 'API 오류'}`);
+        }
+
+        const items = Array.from(doc.querySelectorAll('item')).map(item => ({
+          aptNm: item.querySelector('aptNm')?.textContent?.trim() || '-',
+          aptDong: item.querySelector('aptDong')?.textContent?.trim() || '',
+          buildYear: item.querySelector('buildYear')?.textContent?.trim() || '',
+          buyerGbn: item.querySelector('buyerGbn')?.textContent?.trim() || '',
+          cdealDay: item.querySelector('cdealDay')?.textContent?.trim() || '',
+          cdealType: item.querySelector('cdealType')?.textContent?.trim() || '',
+          dealAmount: item.querySelector('dealAmount')?.textContent?.trim() || '',
+          dealDay: item.querySelector('dealDay')?.textContent?.trim() || '',
+          dealMonth: item.querySelector('dealMonth')?.textContent?.trim() || '',
+          dealYear: item.querySelector('dealYear')?.textContent?.trim() || '',
+          dealingGbn: item.querySelector('dealingGbn')?.textContent?.trim() || '',
+          estateAgentSggNm: item.querySelector('estateAgentSggNm')?.textContent?.trim() || '',
+          excluUseAr: item.querySelector('excluUseAr')?.textContent?.trim() || '',
+          floor: item.querySelector('floor')?.textContent?.trim() || '',
+          jibun: item.querySelector('jibun')?.textContent?.trim() || '',
+          rgstDate: item.querySelector('rgstDate')?.textContent?.trim() || '',
+          sggCd: item.querySelector('sggCd')?.textContent?.trim() || '',
+          slerGbn: item.querySelector('slerGbn')?.textContent?.trim() || '',
+          umdNm: item.querySelector('umdNm')?.textContent?.trim() || '',
+        }));
+
+        state.raw = items;
+        applyFilters(dayFilter);
+        setStatus(`${selectedRegionName()} ${dealYmd.slice(0,4)}-${dealYmd.slice(4,6)} 조회 완료`, 'ok');
       } catch (err) {
         console.error(err);
-        setMessage(`오류: ${err.message}. 직접호출이 차단되면 브라우저나 네트워크 환경 문제일 수 있습니다.`, 'warn');
-      } finally {
-        searchBtn.disabled = false;
+        setStatus(`오류: ${err.message}`, 'error');
       }
     }
 
-    sidoEl.addEventListener('change', populateSigungu);
-    dealDayEl.addEventListener('change', () => render(lastItems));
-    searchBtn.addEventListener('click', handleSearch);
-    sampleBtn.addEventListener('click', () => {
-      lastItems = sampleItems;
-      populateDayOptions(sampleItems);
-      render(sampleItems);
-      setMessage('샘플 데이터를 표시했습니다.', 'ok');
-    });
+    function applyFilters(passedDay) {
+      const aptKeyword = $('aptSearch').value.trim().toLowerCase();
+      const dayVal = typeof passedDay === 'string' ? passedDay : $('dealDay').value;
+      const sortBy = $('sortBy').value;
 
-    setDefaultMonth();
-    populateSido();
+      let filtered = [...state.raw];
+      if (dayVal) filtered = filtered.filter(x => String(Number(x.dealDay || 0)) === String(Number(dayVal)));
+      if (aptKeyword) filtered = filtered.filter(x => x.aptNm.toLowerCase().includes(aptKeyword));
+
+      const groupedMap = new Map();
+      for (const item of filtered) {
+        const key = item.aptNm;
+        if (!groupedMap.has(key)) groupedMap.set(key, []);
+        groupedMap.get(key).push(item);
+      }
+
+      let grouped = Array.from(groupedMap.entries()).map(([aptNm, items]) => {
+        const sortedItems = items.sort((a,b) => {
+          const da = new Date(`${a.dealYear}-${String(a.dealMonth).padStart(2,'0')}-${String(a.dealDay).padStart(2,'0')}`);
+          const db = new Date(`${b.dealYear}-${String(b.dealMonth).padStart(2,'0')}-${String(b.dealDay).padStart(2,'0')}`);
+          return db - da;
+        });
+        const prices = sortedItems.map(x => Number(String(x.dealAmount).replace(/,/g,'')) || 0);
+        const latest = sortedItems[0];
+        return {
+          aptNm,
+          items: sortedItems,
+          count: sortedItems.length,
+          maxPrice: Math.max(...prices, 0),
+          latestDate: latest ? formatDate(latest.dealYear, latest.dealMonth, latest.dealDay) : '-',
+          latestDong: latest?.aptDong || '',
+          cancelCount: sortedItems.filter(x => x.cdealType || x.cdealDay).length,
+        };
+      });
+
+      grouped.sort((a,b) => {
+        if (sortBy === 'priceDesc') return b.maxPrice - a.maxPrice;
+        if (sortBy === 'priceAsc') return a.maxPrice - b.maxPrice;
+        if (sortBy === 'countDesc') return b.count - a.count;
+        return (new Date(b.latestDate)) - (new Date(a.latestDate));
+      });
+
+      state.filtered = filtered;
+      state.grouped = grouped;
+      render();
+    }
+
+    function render() {
+      $('mAptCount').textContent = state.grouped.length.toLocaleString('ko-KR');
+      $('mTradeCount').textContent = state.filtered.length.toLocaleString('ko-KR');
+      $('mCancelCount').textContent = state.filtered.filter(x => x.cdealType || x.cdealDay).length.toLocaleString('ko-KR');
+      updateRegionMetric();
+
+      const root = $('groupList');
+      if (!state.grouped.length) {
+        root.innerHTML = '<div class="card" style="padding:18px; color:#6b7280;">표시할 데이터가 없습니다.</div>';
+        return;
+      }
+
+      root.innerHTML = state.grouped.map((g, idx) => {
+        const details = g.items.map(item => {
+          const cancelled = item.cdealType || item.cdealDay;
+          return `
+            <tr>
+              <td>${formatDate(item.dealYear, item.dealMonth, item.dealDay)}</td>
+              <td>${item.aptDong || '-'}</td>
+              <td>${item.excluUseAr || '-'}</td>
+              <td>${item.floor || '-'}</td>
+              <td>
+                ${formatMoney(item.dealAmount)} ${cancelled ? '<span class="cancel">(해제)</span>' : ''}
+                ${item.cdealDay ? `<div class="small">해제일: ${item.cdealDay}</div>` : ''}
+              </td>
+              <td>${item.dealingGbn || '-'}</td>
+              <td>${item.estateAgentSggNm || '-'}</td>
+            </tr>`;
+        }).join('');
+
+        return `
+          <div class="group ${idx === 0 ? 'open' : ''}">
+            <div class="group-head" data-index="${idx}">
+              <div class="chev">›</div>
+              <div>
+                <div class="apt-name">${g.aptNm}</div>
+                <div class="small">최신 계약일 ${g.latestDate}${g.latestDong ? ` · ${g.latestDong}` : ''}</div>
+              </div>
+              <div>
+                <div class="small">거래건수</div>
+                <div><b>${g.count}</b>건</div>
+              </div>
+              <div>
+                <div class="small">최고 거래가</div>
+                <div><b>${g.maxPrice ? g.maxPrice.toLocaleString('ko-KR') : '-'}만원</b></div>
+              </div>
+              <div>${g.cancelCount ? `<span class="pill">해제 ${g.cancelCount}건</span>` : '<span class="pill">정상</span>'}</div>
+            </div>
+            <div class="details">
+              <table>
+                <thead>
+                  <tr>
+                    <th>계약일</th>
+                    <th>동</th>
+                    <th>전용면적</th>
+                    <th>층</th>
+                    <th>거래금액</th>
+                    <th>거래유형</th>
+                    <th>중개사소재지</th>
+                  </tr>
+                </thead>
+                <tbody>${details}</tbody>
+              </table>
+            </div>
+          </div>`;
+      }).join('');
+
+      document.querySelectorAll('.group-head').forEach(el => {
+        el.addEventListener('click', () => el.parentElement.classList.toggle('open'));
+      });
+    }
+
+    function downloadCsv() {
+      if (!state.filtered.length) {
+        setStatus('다운로드할 데이터가 없습니다.', 'error');
+        return;
+      }
+      const rows = [
+        ['단지명','계약일','동','전용면적','층','거래금액','해제여부','해제일','거래유형','중개사소재지']
+      ];
+      for (const item of state.filtered) {
+        rows.push([
+          item.aptNm,
+          formatDate(item.dealYear, item.dealMonth, item.dealDay),
+          item.aptDong || '',
+          item.excluUseAr || '',
+          item.floor || '',
+          item.dealAmount || '',
+          (item.cdealType || item.cdealDay) ? '해제' : '정상',
+          item.cdealDay || '',
+          item.dealingGbn || '',
+          item.estateAgentSggNm || ''
+        ]);
+      }
+      const csv = '\uFEFF' + rows.map(row => row.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'apt_trade.csv';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function initEvents() {
+      $('sido').addEventListener('change', populateSigungu);
+      $('sigungu').addEventListener('change', updateRegionMetric);
+      $('loadBtn').addEventListener('click', loadTrades);
+      $('dealDay').addEventListener('change', () => applyFilters());
+      $('aptSearch').addEventListener('input', () => applyFilters());
+      $('sortBy').addEventListener('change', () => applyFilters());
+      $('csvBtn').addEventListener('click', downloadCsv);
+    }
+
+    function init() {
+      initYmd();
+      initDays();
+      populateSido();
+      initEvents();
+      updateRegionMetric();
+    }
+
+    init();
   </script>
 </body>
 </html>
