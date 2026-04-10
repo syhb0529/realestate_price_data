@@ -159,12 +159,8 @@
       font-size: 12px;
       color: #374151;
     }
-    .bottom-panel {
-      position: sticky;
-      bottom: 0;
-      background: rgba(246,248,251,0.95);
-      backdrop-filter: blur(6px);
-      padding: 14px 0 4px;
+    .top-panel {
+      margin-bottom: 16px;
     }
     .filters {
       padding: 14px;
@@ -197,37 +193,7 @@
 </head>
 <body>
   <div class="wrap">
-    <div class="hero">
-      <h1>아파트 실거래 조회</h1>
-      <div class="sub">
-        같은 단지는 하나로 묶고, 화살표를 눌러 세부 거래를 펼쳐봅니다.<br>
-        해제 거래는 가격 옆에 <b>(해제)</b>로 표기합니다. 조회할 때마다 API를 다시 호출합니다.
-      </div>
-
-      <div class="search-box">
-        <input id="aptSearch" type="text" placeholder="단지명 검색" />
-        <select id="sortBy">
-          <option value="latest">최신 계약일순</option>
-          <option value="priceDesc">최고가순</option>
-          <option value="priceAsc">최저가순</option>
-          <option value="countDesc">거래건수순</option>
-        </select>
-        <button id="csvBtn" class="btn-secondary" type="button">CSV 다운로드</button>
-      </div>
-
-      <div id="status" class="status">하단에서 지역과 년월/일을 고른 뒤 조회하세요.</div>
-    </div>
-
-    <div class="summary">
-      <div class="metric"><div class="label">조회 단지 수</div><div id="mAptCount" class="value">0</div></div>
-      <div class="metric"><div class="label">조회 거래 수</div><div id="mTradeCount" class="value">0</div></div>
-      <div class="metric"><div class="label">해제 거래 수</div><div id="mCancelCount" class="value">0</div></div>
-      <div class="metric"><div class="label">현재 지역</div><div id="mRegion" class="value" style="font-size:18px;">-</div></div>
-    </div>
-
-    <div id="groupList" class="group-list"></div>
-
-    <div class="bottom-panel">
+    <div class="top-panel">
       <div class="card filters">
         <div class="filters-grid">
           <div class="field">
@@ -254,6 +220,38 @@
           서비스키는 개인용으로 HTML 내부에 고정되어 있습니다. 공개 저장소/공개 배포용으로는 권장되지 않습니다.
         </div>
       </div>
+    </div>
+
+    <div class="hero">
+      <h1>아파트 실거래 조회</h1>
+      <div class="sub">
+        같은 단지는 하나로 묶고, 화살표를 눌러 세부 거래를 펼쳐봅니다.<br>
+        해제 거래는 가격 옆에 <b>(해제)</b>로 표기합니다. 조회할 때마다 API를 다시 호출합니다.
+      </div>
+
+      <div class="search-box">
+        <input id="aptSearch" type="text" placeholder="단지명 검색" />
+        <select id="sortBy">
+          <option value="latest">최신 계약일순</option>
+          <option value="priceDesc">최고가순</option>
+          <option value="priceAsc">최저가순</option>
+          <option value="countDesc">거래건수순</option>
+        </select>
+        <button id="csvBtn" class="btn-secondary" type="button">CSV 다운로드</button>
+      </div>
+
+      <div id="status" class="status">상단에서 지역과 년월/일을 고른 뒤 조회하세요.</div>
+    </div>
+
+    <div class="summary">
+      <div class="metric"><div class="label">조회 단지 수</div><div id="mAptCount" class="value">0</div></div>
+      <div class="metric"><div class="label">조회 거래 수</div><div id="mTradeCount" class="value">0</div></div>
+      <div class="metric"><div class="label">해제 거래 수</div><div id="mCancelCount" class="value">0</div></div>
+      <div class="metric"><div class="label">현재 지역</div><div id="mRegion" class="value" style="font-size:18px;">-</div></div>
+    </div>
+
+    <div id="groupList" class="group-list"></div>
+
     </div>
   </div>
 
